@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workbook Interactivo 2.6 - Sesión C (Completo)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .brand-blue { color: #00529B; }
+        .brand-orange { color: #F68D2E; }
+        .bg-brand-blue { background-color: #00529B; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #00529B; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #003f7a; }
+
+        .section-content {
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+        }
+        .section-content.active {
+            display: block;
+            opacity: 1;
+        }
+        .nav-link.active {
+            background-color: #eef2ff;
+            color: #00529B;
+            font-weight: 700;
+        }
+        .completion-icon {
+            transition: all 0.3s ease;
+        }
+        .instructions-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #00529B;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .pro-tip {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        
+        .fcl-tab-button-2-2 { transition: all 0.3s ease; }
+        .fcl-tab-button-2-2.active { border-color: #F68D2E; background-color: #fff; color: #F68D2E; font-weight: 700; }
+        .fcl-tab-content-2-2 { display: none; }
+        .fcl-tab-content-2-2.active { display: block; }
+        .analysis-point { background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 0 0.5rem 0.5rem 0; }
+
+        /* --- ESTILOS PARA EJERCICIO 3 --- */
+        .score-cell {
+            transition: background-color 0.5s ease;
+        }
+        input[type="radio"].ej3-radio {
+            display: none;
+        }
+        input[type="radio"].ej3-radio + label {
+            cursor: pointer;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease-in-out;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 2px solid #e5e7eb;
+            background-color: #f9fafb;
+            color: #4b5563;
+        }
+        input[type="radio"].ej3-radio:checked + label {
+            transform: scale(1.05);
+        }
+        input[type="radio"].ej3-radio[value="2"]:checked + label { background-color: #22c55e; color: white; border-color: #16a34a; }
+        input[type="radio"].ej3-radio[value="1"]:checked + label { background-color: #facc15; color: #422006; border-color: #f59e0b; }
+        input[type="radio"].ej3-radio[value="0"]:checked + label { background-color: #ef4444; color: white; border-color: #dc2626; }
+
+        /* --- INICIO: ESTILOS AÑADIDOS DE EJERCICIO 5 --- */
+        .step-content {
+            transition: opacity 0.5s ease-in-out, max-height 0.7s ease-in-out;
+            overflow: hidden;
+        }
+        .hidden-step {
+            opacity: 0;
+            max-height: 0;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            border: none !important;
+        }
+        .visible-step {
+            opacity: 1;
+            max-height: 1500px; /* Adjust as needed for content */
+        }
+        /* --- FIN: ESTILOS AÑADIDOS DE EJERCICIO 5 --- */
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <aside class="w-full md:w-80 bg-white shadow-lg p-6 sticky top-0 h-screen overflow-y-auto flex flex-col">
+            <div class="flex items-center justify-center mb-6">
+                <img src="https://placehold.co/250x100/FFFFFF/00529B?text=Mi+Empresa\nCrece&font=montserrat" alt="Logo Mi Empresa Crece" class="h-20">
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="text-sm font-bold text-gray-600 mb-2">Progreso Sesión C (1/2)</h4>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-brand-blue h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <nav id="nav-menu" class="flex-grow">
+                <ul class="space-y-1">
+                    </ul>
+            </nav>
+            <div class="mt-auto pt-6">
+                <button id="export-pdf" class="w-full flex items-center justify-center gap-2 bg-brand-blue text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-800 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" /></svg>
+                    Exportar a PDF
+                </button>
+            </div>
+             <div id="loading" class="mt-4 text-center" style="display: none;">
+                <p class="text-brand-blue animate-pulse">Generando PDF, por favor espera...</p>
+            </div>
+        </aside>
+
+        <main id="main-content" class="flex-1 p-6 md:p-10 overflow-y-auto">
+            <header class="bg-white shadow-md rounded-xl p-6 mb-8">
+                <h1 class="text-4xl font-black brand-blue">Workbook Interactivo 2.6</h1>
+                <p class="text-lg text-gray-600 mt-2">Sesión C: Gasto Inteligente, Inversiones Efectivas (Parte 1)</p>
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Nombre del participante" class="autosave-input p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange focus:border-transparent transition" data-id="sesionc_nombre_participante">
+                    <input type="text" placeholder="Empresa" class="autosave-input p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange focus:border-transparent transition" data-id="sesionc_nombre_empresa">
+                </div>
+            </header>
+            
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainContent = document.getElementById('main-content');
+            const navMenu = document.getElementById('nav-menu').querySelector('ul');
+            
+            // --- PASO 1: MODIFICAR EL ARREGLO DE NAVEGACIÓN ---
+            const sectionsData = [
+                { id: 'ej1', title: '1. Diagnóstico de Consolidación de Finanzas' },
+                { id: 'ej2', title: '2. Plan de Acción para la Consolidación Financiera' }, // MODIFICADO
+                { id: 'ej3', title: '3. Práctica de Gestión de inversiones' },
+                { id: 'ej4', title: '4. Cálculo de Flujo de Caja Libre' },
+                { id: 'ej5', title: '5. Análisis Rápido de Prioridades de Negocio' }, // MODIFICADO
+            ];
+
+            sectionsData.forEach(data => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <a href="#${data.id}" class="nav-link flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-brand-blue transition-colors duration-300 text-sm">
+                        <span class="completion-icon text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </span>
+                        <span class="flex-grow">${data.title}</span>
+                    </a>`;
+                navMenu.appendChild(li);
+
+                const section = document.createElement('section');
+                section.id = data.id;
+                section.className = 'section-content bg-white shadow-xl rounded-2xl p-8 mb-8';
+                mainContent.appendChild(section);
+            });
+            
+            // --- PASO 2: INYECTAR CONTENIDO HTML EN SECCIONES ---
+            
+            document.getElementById('ej1').innerHTML = `
+    <h2 class="text-2xl font-bold brand-orange mb-4">${sectionsData[0].title}</h2>
+    <div class="instructions-box">
+        <p><strong>Meta Transformacional:</strong> Internalizar que tú no eres la empresa. Crear reglas claras te da libertad y protege tanto tu patrimonio como el negocio. Este es el primer paso para tomar decisiones de inversión profesionales.</p>
+    </div>
+    
+    <div class="space-y-10">
+        <div class="bg-gray-50 p-6 rounded-lg border">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Apartado A: Fijación de Sueldo del Fundador</h3>
+            
+            <div class="mb-6">
+                <label class="block font-semibold text-gray-700 mb-2">1. ¿Has establecido un salario fijo para ti, o tus ingresos varían según el desempeño de la empresa?</label>
+                <div class="flex flex-col space-y-2">
+                    <label><input type="radio" name="salario_tipo" value="fijo" class="autosave-input form-radio" data-section="ej1" data-id="ej1_salario_tipo"> Salario fijo</label>
+                    <label><input type="radio" name="salario_tipo" value="combinado" class="autosave-input form-radio" data-section="ej1" data-id="ej1_salario_tipo"> Combinación de fijo y variable</label>
+                    <label><input type="radio" name="salario_tipo" value="variable" class="autosave-input form-radio" data-section="ej1" data-id="ej1_salario_tipo"> Totalmente variable</label>
+                    <label><input type="radio" name="salario_tipo" value="ninguno" class="autosave-input form-radio" data-section="ej1" data-id="ej1_salario_tipo"> No recibo ingresos</label>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                 <h4 class="font-semibold text-gray-700 mb-2">Tablas de Referencia (Sueldos en MXN/mes)</h4>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead><tr class="bg-gray-200"><th colspan="2" class="p-2">1. Referentes de mercado</th></tr></thead>
+                            <tbody class="divide-y">
+                                <tr class="bg-white"><td>Microempresa</td><td class="text-right">$25k – $40k</td></tr>
+                                <tr class="bg-gray-50"><td>Pequeña empresa</td><td class="text-right">$30k – $45k</td></tr>
+                                <tr class="bg-white"><td>Mediana empresa</td><td class="text-right">$45k – $60k</td></tr>
+                                <tr class="bg-gray-50"><td><b>Director General Senior</b></td><td class="text-right"><b>Hasta $120,000+</b></td></tr>
+                                <tr class="bg-white"><td>Promedio PYME</td><td class="text-right">$30k – $80k</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead><tr class="bg-gray-200"><th colspan="2" class="p-2">2. Límites por facturación</th></tr></thead>
+                            <tbody class="divide-y">
+                                <tr class="bg-white"><td>$300k – $1M</td><td class="text-right">$18k – $60k</td></tr>
+                                <tr class="bg-gray-50"><td>$1M – $5M</td><td class="text-right">$30k – $90k</td></tr>
+                                <tr class="bg-white"><td>$5M – $20M</td><td class="text-right">$60k – $200k</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                 </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block font-semibold text-gray-700 mb-2">2. Define un sueldo de mercado para tu puesto si contrataras a un externo competente para tus funciones operativas.</label>
+                 <div class="pro-tip !mt-0 !mb-4"><p>(Opcional) Busca en bolsas de trabajo perfiles de referencia (Gerente comercial, de operaciones, etc.) para validar tu criterio.</p></div>
+                <textarea placeholder="Basado en el mercado, un sueldo justo para mi rol sería..." class="autosave-input w-full p-3 border border-gray-300 rounded-lg h-24" data-section="ej1" data-id="ej1_salario_mercado"></textarea>
+            </div>
+
+            <div class="mb-6">
+                <label class="block font-semibold text-gray-700 mb-2">3. Define o valida un rango de sueldo consistente y coherente con los criterios analizados.</label>
+                <input type="text" placeholder="Mi sueldo fijo mensual será de..." class="autosave-input w-full p-3 border border-gray-300 rounded-lg" data-section="ej1" data-id="ej1_salario_definido">
+            </div>
+
+        </div>
+        
+        </div>
+`;
+            
+            // ----- INICIO: CÓDIGO HTML AÑADIDO PARA EJERCICIO 2 -----
+            document.getElementById('ej2').innerHTML = `
+                <h2 class="text-2xl font-bold brand-orange mb-4">2. Plan de Acción para la Consolidación Financiera</h2>
+                <div class="instructions-box">
+                    <p><strong>Meta Transformacional:</strong> Formalizar tu relación financiera con la empresa y alinearla con tus metas de crecimiento, sentando las bases para una toma de decisiones de inversión profesional y estratégica.</p>
+                </div>
+
+                <div class="space-y-10">
+                    <div class="bg-gray-50 p-6 rounded-lg border">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Apartado A: Definición de Políticas de Compensación y Utilidades</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label class="block font-semibold text-gray-700 mb-2">1. Tipo de Compensación del Dueño</label>
+                                <div id="tipo-compensacion-group" class="flex flex-col space-y-2">
+                                    <label><input type="radio" name="tipo_compensacion" value="fijo" class="autosave-input form-radio" data-section="ej2" data-id="ej2_tipo_comp"> Sueldo Fijo</label>
+                                    <label><input type="radio" name="tipo_compensacion" value="variable" class="autosave-input form-radio" data-section="ej2" data-id="ej2_tipo_comp"> Compensación Variable (Reparto Utilidades)</label>
+                                    <label><input type="radio" name="tipo_compensacion" value="mixto" class="autosave-input form-radio" data-section="ej2" data-id="ej2_tipo_comp" checked> Mixto (Sueldo Fijo + Bono por Utilidades)</label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-gray-700 mb-2">2. Prioridad de la Política de Utilidades</label>
+                                <div class="flex flex-col space-y-2">
+                                    <label><input type="radio" name="prioridad_utilidades" value="sostenimiento" class="autosave-input form-radio" data-section="ej2" data-id="ej2_prio_util"> Sostenimiento Operativo</label>
+                                    <label><input type="radio" name="prioridad_utilidades" value="reinversion" class="autosave-input form-radio" data-section="ej2" data-id="ej2_prio_util" checked> Reinversión para Crecimiento</label>
+                                    <label><input type="radio" name="prioridad_utilidades" value="monetizacion" class="autosave-input form-radio" data-section="ej2" data-id="ej2_prio_util"> Monetización/Capitalización Dueño</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 space-y-6">
+                            <div id="sueldo-fijo-section">
+                                <h4 class="font-semibold text-gray-700 border-b pb-2 mb-4">Política de Sueldo Fijo</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="sueldo-fijo-actualizado" class="block text-sm font-medium text-gray-600">Sueldo fijo actualizado</label>
+                                        <input type="text" id="sueldo-fijo-actualizado" placeholder="$50,000 MXN" class="autosave-input mt-1 w-full p-2 border rounded-md" data-section="ej2" data-id="ej2_sueldo_fijo">
+                                    </div>
+                                    <div>
+                                        <label for="fecha-vigencia-fijo" class="block text-sm font-medium text-gray-600">Fecha vigencia actualización</label>
+                                        <input type="date" id="fecha-vigencia-fijo" class="autosave-input mt-1 w-full p-2 border rounded-md" data-section="ej2" data-id="ej2_fecha_fijo">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="sueldo-variable-section">
+                                <h4 class="font-semibold text-gray-700 border-b pb-2 mb-4">Política de Sueldo Variable</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600 mb-2">Periodicidad</label>
+                                        <select class="autosave-input w-full p-2 border rounded-md" data-section="ej2" data-id="ej2_var_periodo">
+                                            <option>Mensual</option>
+                                            <option>Bimestral</option>
+                                            <option selected>Trimestral</option>
+                                            <option>Semestral</option>
+                                            <option>Anual</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600 mb-2">Tipo Reparto Utilidad</label>
+                                        <div class="flex space-x-4">
+                                            <label><input type="radio" name="tipo_reparto" value="porcentual" class="autosave-input form-radio" data-section="ej2" data-id="ej2_var_tipo_reparto" checked> Porcentual</label>
+                                            <label><input type="radio" name="tipo_reparto" value="monto_base" class="autosave-input form-radio" data-section="ej2" data-id="ej2_var_tipo_reparto"> Monto Base</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <label for="monto-reparto" class="block text-sm font-medium text-gray-600">Porcentaje o Monto Base de Reparto</label>
+                                    <input type="text" id="monto-reparto" placeholder="Ej: 15% sobre utilidad neta" class="autosave-input mt-1 w-full p-2 border rounded-md" data-section="ej2" data-id="ej2_var_monto">
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <label for="fecha-vigencia-variable" class="block text-sm font-medium text-gray-600">Fecha vigencia</label>
+                                        <input type="date" id="fecha-vigencia-variable" class="autosave-input mt-1 w-full p-2 border rounded-md" data-section="ej2" data-id="ej2_var_fecha_vigencia">
+                                    </div>
+                                    <div>
+                                        <label for="fecha-revision-variable" class="block text-sm font-medium text-gray-600">Próxima Fecha Revisión</label>
+                                        <input type="date" id="fecha-revision-variable" class="autosave-input mt-1 w-full p-2 border rounded-md" data-section="ej2" data-id="ej2_var_fecha_revision">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-lg border">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Apartado B: Alineación Estratégica - Metas y Proyectos</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="font-semibold text-gray-700">Borrador de Metas Anuales Vigentes</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                                    <input type="text" placeholder="Meta de Ingreso Vigente" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_meta_ingreso">
+                                    <input type="text" placeholder="Meta de Utilidad Vigente" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_meta_utilidad">
+                                    <div>
+                                        <label for="fecha-fijacion-metas" class="block text-xs text-gray-500">Fecha objetivo fijación definitiva</label>
+                                        <input type="date" id="fecha-fijacion-metas" class="autosave-input w-full p-2 border rounded-md" data-section="ej2" data-id="ej2_meta_fecha">
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-700">Iniciativas de Inversión Estratégicas</h4>
+                                <div class="space-y-2 mt-2">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                        <input type="text" placeholder="Proyecto 1: Nombre" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_proy1_nombre">
+                                        <input type="text" placeholder="Enfoque (Ventas, Op, etc.)" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_proy1_enfoque">
+                                        <input type="text" placeholder="Monto Estimado" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_proy1_monto">
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                        <input type="text" placeholder="Proyecto 2: Nombre" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_proy2_nombre">
+                                        <input type="text" placeholder="Enfoque" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_proy2_enfoque">
+                                        <input type="text" placeholder="Monto Estimado" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_proy2_monto">
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                        <input type="text" placeholder="Proyecto 3: Nombre" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_proy3_nombre">
+                                        <input type="text" placeholder="Enfoque" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_proy3_enfoque">
+                                        <input type="text" placeholder="Monto Estimado" class="autosave-input p-2 border rounded-md" data-section="ej2" data-id="ej2_proy3_monto">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-lg border">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Apartado C: Compromiso de Ejecución</h3>
+                        <label for="fecha-compromiso-proyecto" class="block font-semibold text-gray-700">Fecha compromiso para tener iniciado un proyecto estratégico de crecimiento:</label>
+                        <input type="date" id="fecha-compromiso-proyecto" class="autosave-input w-full md:w-1/2 mt-2 p-3 border rounded-lg" data-section="ej2" data-id="ej2_fecha_compromiso">
+                    </div>
+                </div>
+            `;
+            // ----- FIN: CÓDIGO HTML AÑADIDO PARA EJERCICIO 2 -----
+
+            // ----- INICIO: CÓDIGO HTML PARA EJERCICIO 3 -----
+            document.getElementById('ej3').innerHTML = `
+                <h2 class="text-2xl font-bold brand-orange mb-4">${sectionsData[2].title}</h2>
+                <div class="instructions-box">
+                    <p><strong>Meta Transformacional:</strong> Realizar una autoevaluación honesta de tus decisiones de inversión pasadas para identificar patrones, revelar puntos ciegos y cuantificar tus áreas de oportunidad, creando así la necesidad de un método robusto para el futuro.</p>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Paso 1: Define tus Inversiones a Evaluar</h3>
+                    <p class="text-gray-600 mb-4">Piensa en las 3 inversiones más importantes (contrataciones, equipo, marketing, etc.) que has realizado en los últimos 12 meses.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="investment-name-1" placeholder="Inversión 1 (Ej: Nuevo Vendedor)" class="autosave-input w-full p-3 border border-gray-300 rounded-lg" data-section="ej3" data-id="ej3_inv_name_1">
+                        <input type="text" id="investment-name-2" placeholder="Inversión 2 (Ej: Maquinaria)" class="autosave-input w-full p-3 border border-gray-300 rounded-lg" data-section="ej3" data-id="ej3_inv_name_2">
+                        <input type="text" id="investment-name-3" placeholder="Inversión 3 (Ej: Campaña Ads)" class="autosave-input w-full p-3 border border-gray-300 rounded-lg" data-section="ej3" data-id="ej3_inv_name_3">
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Paso 2: Autoevaluación Retrospectiva</h3>
+                    <p class="text-gray-600 mb-4">Para cada inversión, evalúa honestamente si aplicaste las siguientes buenas prácticas. (Sí = 2 pts, Parcial = 1 pto, No = 0 pts)</p>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full w-full border-collapse" id="evaluation-matrix">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="p-3 text-left text-sm font-semibold text-gray-700 w-2/5">Buena Práctica de Inversión</th>
+                                    <th class="p-3 text-center text-sm font-semibold text-gray-700 investment-header-1">Inversión 1</th>
+                                    <th class="p-3 text-center text-sm font-semibold text-gray-700 investment-header-2">Inversión 2</th>
+                                    <th class="p-3 text-center text-sm font-semibold text-gray-700 investment-header-3">Inversión 3</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-gray-100 font-bold">
+                                    <td class="p-4 text-right text-gray-800">Score de Inversión (Máx. 16)</td>
+                                    <td class="p-4 text-center text-xl score-cell" id="score-1">0</td>
+                                    <td class="p-4 text-center text-xl score-cell" id="score-2">0</td>
+                                    <td class="p-4 text-center text-xl score-cell" id="score-3">0</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 text-center">Tus Resultados</h3>
+                        <div class="text-center">
+                            <p class="text-gray-600">Score General de Madurez en Inversión</p>
+                            <div id="general-score" class="text-6xl font-black brand-blue my-2">0%</div>
+                            <p id="score-feedback" class="font-semibold text-gray-700">Define tus inversiones para comenzar.</p>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-300">
+                         <h3 class="text-xl font-bold text-gray-800 mb-2">Paso 3: Reflexión Final</h3>
+                         <label for="reflection" class="text-gray-600 mb-2 block">Basado en tu score, ¿cuál es el área de oportunidad N°1 que revela este diagnóstico en tu proceso de toma de decisiones?</label>
+                         <textarea id="reflection" rows="4" placeholder="Ej: Necesito calcular siempre el Flujo de Caja Libre antes de decidir..." class="autosave-input w-full p-3 border border-gray-300 rounded-lg" data-section="ej3" data-id="ej3_reflection"></textarea>
+                    </div>
+                </div>
+            `;
+            // ----- FIN: CÓDIGO HTML PARA EJERCICIO 3 -----
+            
+            document.getElementById('ej4').innerHTML = `
+                <h2 class="text-2xl font-bold brand-orange mb-4">4. Cálculo de Flujo de Caja Libre</h2>
+                <div class="instructions-box">
+                    <p><strong>Meta Transformacional:</strong> Transformar el cálculo del FCL de una simple resta a un diagnóstico dinámico de tu capacidad real de inversión, capturando la estacionalidad de tu negocio para tomar decisiones financieras más inteligentes.</p>
+                </div>
+                <div id="fcl-container-2-2" class="mt-6">
+                    <div class="border-b border-gray-200 mb-6">
+                        <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                            <button class="fcl-tab-button-2-2 active whitespace-nowrap py-3 px-4 border-b-4 font-medium text-lg" data-tab="calculator">Mi Calculadora FCL</button>
+                            <button class="fcl-tab-button-2-2 whitespace-nowrap py-3 px-4 border-b-4 font-medium text-lg" data-tab="example">Ejemplo Guiado</button>
+                        </nav>
+                    </div>
+                    <div id="calculator-content-2-2" class="fcl-tab-content-2-2 active">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <p class="text-gray-600">Introduce los datos de tu empresa para un análisis de 3 o 6 meses.</p>
+                            <div class="inline-flex rounded-lg shadow-sm flex-shrink-0">
+                                <button id="view-3m-2-2" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 focus:z-10 focus:ring-2 focus:ring-blue-500">3 Meses</button>
+                                <button id="view-6m-2-2" class="px-4 py-2 text-sm font-medium text-white bg-brand-blue border border-gray-200 rounded-r-lg hover:bg-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-500">6 Meses</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto mb-8">
+                            <table class="min-w-full" id="fcl-input-table-2-2"></table>
+                        </div>
+                        <div id="fcl-results-container-2-2" class="bg-gray-50 p-6 rounded-xl border hidden">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Diagnóstico y Capacidad de Inversión</h3>
+                            <div class="mb-6">
+                                <h4 class="font-bold text-gray-700 mb-2">Diagnóstico Mensual de FCL</h4>
+                                <div id="monthly-fcl-results-2-2" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-center"></div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div class="bg-white p-4 rounded-lg shadow text-center">
+                                    <p class="text-sm text-gray-500">Promedio de Flujo de Caja Libre Mensual</p>
+                                    <p id="avg-monthly-fcl-2-2" class="text-2xl font-bold text-brand-blue">$0.00</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg shadow text-center">
+                                    <p class="text-sm text-gray-500">Proyección Anualizada de FCL</p>
+                                    <p id="annual-fcl-2-2" class="text-2xl font-bold text-brand-blue">$0.00</p>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-700 mb-3 text-center">Ponderación de Capacidad de Inversión Anual</h4>
+                                <div class="space-y-3">
+                                    <div id="semaphore-green-2-2" class="flex items-center p-3 bg-green-100 border-l-4 border-green-500 rounded-r-lg">
+                                        <div class="w-8 h-8 rounded-full bg-green-500 flex-shrink-0"></div>
+                                        <div class="ml-4">
+                                            <p class="font-bold text-green-800">Inversión Segura (0% - 8%)</p>
+                                            <p class="text-sm text-green-700 font-medium">$0.00 - $0.00</p>
+                                        </div>
+                                    </div>
+                                    <div id="semaphore-blue-2-2" class="flex items-center p-3 bg-blue-100 border-l-4 border-blue-500 rounded-r-lg">
+                                        <div class="w-8 h-8 rounded-full bg-blue-500 flex-shrink-0"></div>
+                                        <div class="ml-4">
+                                            <p class="font-bold text-blue-800">Inversión Calculada (8% - 20%)</p>
+                                            <p class="text-sm text-blue-700 font-medium">$0.00 - $0.00</p>
+                                        </div>
+                                    </div>
+                                    <div id="semaphore-yellow-2-2" class="flex items-center p-3 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg">
+                                        <div class="w-8 h-8 rounded-full bg-yellow-500 flex-shrink-0"></div>
+                                        <div class="ml-4">
+                                            <p class="font-bold text-yellow-800">Inversión de Alto Riesgo (21% - 70%)</p>
+                                            <p class="text-sm text-yellow-700 font-medium">$0.00 - $0.00</p>
+                                        </div>
+                                    </div>
+                                    <div id="semaphore-red-2-2" class="flex items-center p-3 bg-red-100 border-l-4 border-red-500 rounded-r-lg">
+                                        <div class="w-8 h-8 rounded-full bg-red-500 flex-shrink-0"></div>
+                                        <div class="ml-4">
+                                            <p class="font-bold text-red-800">Riesgo de Descapitalización (71% - 100%)</p>
+                                            <p class="text-sm text-red-700 font-medium">$0.00 - $0.00</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="example-content-2-2" class="fcl-tab-content-2-2">
+                        <div class="bg-white p-2 sm:p-6 rounded-lg">
+                            <h3 class="text-2xl font-bold brand-orange mb-2">Ejemplo Guiado: "Creativa Digital"</h3>
+                            <div class="analysis-point mb-6">
+                                <p><strong>Perfil de la Empresa:</strong> Agencia de marketing con 5 empleados, con ingresos variables por proyectos y altos gastos fijos. Acaban de invertir en equipo y personal, y ahora enfrentan una caída estacional de ventas en verano.</p>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left font-medium text-gray-500 uppercase">Concepto</th>
+                                            <th class="px-4 py-3 text-right font-medium text-gray-500 uppercase">Mes 1</th>
+                                            <th class="px-4 py-3 text-right font-medium text-gray-500 uppercase">Mes 2</th>
+                                            <th class="px-4 py-3 text-right font-medium text-gray-500 uppercase">Mes 3</th>
+                                            <th class="px-4 py-3 text-right font-medium text-gray-500 uppercase">Mes 4</th>
+                                            <th class="px-4 py-3 text-right font-medium text-gray-500 uppercase">Mes 5</th>
+                                            <th class="px-4 py-3 text-right font-medium text-gray-500 uppercase">Mes 6</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr class="bg-blue-50"><td colspan="7" class="px-4 py-2 font-bold text-blue-800">INGRESOS</td></tr>
+                                        <tr><td class="px-4 py-3">Ingresos por Ventas (Cobrados)</td><td class="px-4 py-3 text-right">$15,000</td><td class="px-4 py-3 text-right">$16,000</td><td class="px-4 py-3 text-right">$15,500</td><td class="px-4 py-3 text-right text-red-600">$8,000</td><td class="px-4 py-3 text-right text-red-600">$9,000</td><td class="px-4 py-3 text-right">$14,000</td></tr>
+                                        <tr><td class="px-4 py-3">Otros Ingresos (Promedio)</td><td class="px-4 py-3 text-right">$500</td><td class="px-4 py-3 text-right">$500</td><td class="px-4 py-3 text-right">$500</td><td class="px-4 py-3 text-right">$500</td><td class="px-4 py-3 text-right">$500</td><td class="px-4 py-3 text-right">$500</td></tr>
+                                        <tr class="bg-red-50"><td colspan="7" class="px-4 py-2 font-bold text-red-800">GASTOS FIJOS</td></tr>
+                                        <tr><td class="px-4 py-3">Renta</td><td class="px-4 py-3 text-right">($1,500)</td><td class="px-4 py-3 text-right">($1,500)</td><td class="px-4 py-3 text-right">($1,500)</td><td class="px-4 py-3 text-right">($1,500)</td><td class="px-4 py-3 text-right">($1,500)</td><td class="px-4 py-3 text-right">($1,500)</td></tr>
+                                        <tr><td class="px-4 py-3">Sueldos</td><td class="px-4 py-3 text-right">($6,000)</td><td class="px-4 py-3 text-right">($6,000)</td><td class="px-4 py-3 text-right">($6,000)</td><td class="px-4 py-3 text-right">($6,000)</td><td class="px-4 py-3 text-right">($6,000)</td><td class="px-4 py-3 text-right">($6,000)</td></tr> 
+                                        <tr><td class="px-4 py-3">Otros Gastos Fijos (Promedio)</td><td class="px-4 py-3 text-right">($500)</td><td class="px-4 py-3 text-right">($500)</td><td class="px-4 py-3 text-right">($500)</td><td class="px-4 py-3 text-right">($500)</td><td class="px-4 py-3 text-right">($500)</td><td class="px-4 py-3 text-right">($500)</td></tr>
+                                        <tr class="bg-yellow-50"><td colspan="7" class="px-4 py-2 font-bold text-yellow-800">GASTOS VARIABLES</td></tr>
+                                        <tr><td class="px-4 py-3">Costo de Ventas</td><td class="px-4 py-3 text-right">($3,000)</td><td class="px-4 py-3 text-right">($3,200)</td><td class="px-4 py-3 text-right">($3,100)</td><td class="px-4 py-3 text-right">($1,600)</td><td class="px-4 py-3 text-right">($1,800)</td><td class="px-4 py-3 text-right">($2,800)</td></tr>
+                                         <tr><td class="px-4 py-3">Promoción</td><td class="px-4 py-3 text-right">($1,000)</td><td class="px-4 py-3 text-right">($1,000)</td><td class="px-4 py-3 text-right">($1,000)</td><td class="px-4 py-3 text-right">($500)</td><td class="px-4 py-3 text-right">($500)</td><td class="px-4 py-3 text-right">($1,000)</td></tr>
+                                         <tr><td class="px-4 py-3">Otros Gastos Variables (Promedio)</td><td class="px-4 py-3 text-right">($200)</td><td class="px-4 py-3 text-right">($200)</td><td class="px-4 py-3 text-right">($200)</td><td class="px-4 py-3 text-right">($200)</td><td class="px-4 py-3 text-right">($200)</td><td class="px-4 py-3 text-right">($200)</td></tr>
+                                        </tbody>
+                                    <tfoot class="bg-gray-100">
+                                        <tr class="font-bold text-base">
+                                            <td class="px-4 py-4 whitespace-nowrap brand-blue">Flujo de Caja Libre (FCL)</td>
+                                            <td class="px-4 py-4 text-right text-green-600">$3,300</td>
+                                            <td class="px-4 py-4 text-right text-green-600">$4,100</td>
+                                            <td class="px-4 py-4 text-right text-green-600">$3,700</td>
+                                            <td class="px-4 py-4 text-right text-red-600">($2,300)</td>
+                                            <td class="px-4 py-4 text-right text-red-600">($1,500)</td>
+                                            <td class="px-4 py-4 text-right text-green-600">$2,500</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                             <div class="analysis-point mt-6">
+                                <p><strong>Análisis del Ejemplo:</strong> El FCL promedio mensual es de $1,633, lo que da una proyección anualizada de $19,600. Esto significa que una inversión "segura" (verde) para Creativa Digital sería de hasta $1,568 al año. Una inversión de $5,000 (como el software que querían comprar) representaría el 25.5% de su FCL anual, cayendo en la categoría de <strong>Alto Riesgo (Amarillo)</strong>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // ----- INICIO: CÓDIGO HTML AÑADIDO PARA EJERCICIO 5 -----
+            document.getElementById('ej5').innerHTML = `
+                <div class="max-w-7xl mx-auto">
+                    <h2 class="text-2xl font-bold brand-orange mb-4">5. Análisis Rápido de Prioridades de Negocio</h2>
+                    <div class="instructions-box">
+                        <p><strong>Meta Transformacional:</strong> Pasar de una lista de ideas a un enfoque estratégico claro. Este ejercicio te guiará para identificar tu área de mayor prioridad y definir las iniciativas clave que impulsarán tu crecimiento.</p>
+                    </div>
+
+                    <div class="space-y-8">
+                        <div id="step-1" class="step-content">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Paso 1: Lluvia de Ideas Estratégicas</h3>
+                            <label class="text-gray-600 mb-4 block">Primero, haz una lluvia de ideas. Escribe hasta 5 prioridades de mejora o crecimiento que tengas en mente para tu negocio.</label>
+                            <div class="space-y-2">
+                                <input type="text" placeholder="Prioridad 1..." class="autosave-input w-full p-3 border border-gray-300 rounded-lg" data-section="ej5" data-id="ej5_prio1">
+                                <input type="text" placeholder="Prioridad 2..." class="autosave-input w-full p-3 border border-gray-300 rounded-lg" data-section="ej5" data-id="ej5_prio2">
+                                <input type="text" placeholder="Prioridad 3..." class="autosave-input w-full p-3 border border-gray-300 rounded-lg" data-section="ej5" data-id="ej5_prio3">
+                                <input type="text" placeholder="Prioridad 4..." class="autosave-input w-full p-3 border border-gray-300 rounded-lg" data-section="ej5" data-id="ej5_prio4">
+                                <input type="text" placeholder="Prioridad 5..." class="autosave-input w-full p-3 border border-gray-300 rounded-lg" data-section="ej5" data-id="ej5_prio5">
+                            </div>
+                            <div class="text-right mt-4">
+                                <button id="btn-start-analysis" class="bg-brand-blue text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-800 transition-colors">Terminé la lluvia de ideas, iniciar análisis</button>
+                            </div>
+                        </div>
+
+                        <div id="guided-analysis-container" class="hidden space-y-8">
+                            <div id="step-2" class="step-content">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Paso 2: Priorización de Áreas Clave</h3>
+                                <p class="text-gray-600 mb-4">Ahora, vamos a estructurar. Asigna una prioridad del 1 (más importante) al 4 a cada área estratégica y explica brevemente tu razonamiento.</p>
+                                <div id="priority-areas-container" class="space-y-4">
+                                    </div>
+                            </div>
+
+                            <div id="step-3" class="step-content hidden-step">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Paso 3: Selección de Tácticas</h3>
+                                <p class="text-gray-600 mb-4">Basado en tu prioridad máxima (<strong id="selected-priority-area" class="brand-orange"></strong>), selecciona 2 tácticas de interés para enfocar tus esfuerzos.</p>
+                                <div id="tactics-container" class="space-y-4">
+                                    </div>
+                            </div>
+                            
+                            <div id="step-4" class="step-content hidden-step">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Paso 4: Detalle de Iniciativas</h3>
+                                <p class="text-gray-600 mb-4">Finalmente, detalla una iniciativa concreta para cada una de las tácticas que seleccionaste.</p>
+                                <div id="initiatives-container" class="space-y-6">
+                                    </div>
+                            </div>
+
+                            <div id="step-5" class="step-content hidden-step">
+                                <h3 class="text-xl font-bold text-gray-800 mb-2">Paso 5: Síntesis de Prioridades de Inversión</h3>
+                                <p class="text-gray-600 mb-4">Este es el resumen de tu enfoque estratégico. Estas son las iniciativas que evaluarás en los siguientes ejercicios.</p>
+                                <div id="synthesis-container" class="bg-blue-50 border border-blue-200 p-6 rounded-lg space-y-4">
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // ----- FIN: CÓDIGO HTML AÑADIDO PARA EJERCICIO 5 -----
+            
+            // --- LÓGICA DE NAVEGACIÓN Y ESTADO ---
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.section-content');
+
+            function showSection(hash) {
+                const targetHash = hash || `#${sectionsData[0].id}`;
+                sections.forEach(section => section.classList.toggle('active', `#${section.id}` === targetHash));
+                navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === targetHash));
+            }
+
+            navMenu.addEventListener('click', function(e) {
+                const link = e.target.closest('.nav-link');
+                if (link) {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    history.pushState(null, null, targetId);
+                    showSection(targetId);
+                    window.scrollTo(0, 0);
+                }
+            });
+            
+            // --- LÓGICA DE COMPLETITUD Y PROGRESO ---
+            function checkCompletion() {
+                let completedSections = 0;
+                sectionsData.forEach(data => {
+                    const sectionInputs = document.querySelectorAll(`.autosave-input[data-section="${data.id}"]`);
+                    let isComplete = Array.from(sectionInputs).some(input => (input.type === 'checkbox' || input.type === 'radio') ? input.checked : input.value.trim() !== '');
+                    
+                    const navLink = document.querySelector(`.nav-link[href="#${data.id}"]`);
+                    const icon = navLink.querySelector('.completion-icon');
+                    if (isComplete) {
+                        completedSections++;
+                        icon.classList.remove('text-gray-400');
+                        icon.classList.add('text-green-500');
+                    } else {
+                        icon.classList.add('text-gray-400');
+                        icon.classList.remove('text-green-500');
+                    }
+                });
+                const progress = (completedSections / sectionsData.length) * 100;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+            }
+
+            // --- AUTOSAVE ---
+            function loadSavedData() {
+                document.querySelectorAll('.autosave-input').forEach(input => {
+                    const savedValue = localStorage.getItem('sesionc_' + input.dataset.id);
+                    if (savedValue !== null) {
+                        if (input.type === 'radio') {
+                             if (input.value === savedValue) {
+                                input.checked = true;
+                            }
+                        } else if (input.type === 'checkbox') {
+                            input.checked = savedValue === 'true';
+                        }
+                        else {
+                            input.value = savedValue;
+                        }
+                         // Disparar un evento de cambio para que las lógicas dependientes se actualicen
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+                checkCompletion();
+            }
+
+            mainContent.addEventListener('input', function(e) {
+                 if (e.target.classList.contains('autosave-input')) {
+                    const input = e.target;
+                    const valueToSave = (input.type === 'checkbox') ? input.checked : input.value;
+                    localStorage.setItem('sesionc_' + input.dataset.id, valueToSave);
+                    checkCompletion();
+                 }
+            });
+             mainContent.addEventListener('change', function(e) {
+                 if (e.target.classList.contains('autosave-input') && (e.target.type === 'radio' || e.target.tagName === 'SELECT')) {
+                    const input = e.target;
+                    localStorage.setItem('sesionc_' + input.dataset.id, input.value);
+                    checkCompletion();
+                 }
+            });
+
+            // --- EXPORTAR A PDF ---
+            document.getElementById('export-pdf').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const loadingIndicator = document.getElementById('loading');
+                loadingIndicator.style.display = 'block';
+                
+                const currentHash = window.location.hash;
+                const activeSection = document.querySelector('.section-content.active');
+                sections.forEach(s => s.classList.add('active'));
+                
+                html2canvas(mainContent, { scale: 2, useCORS: true }).then(canvas => {
+                    sections.forEach(s => s.classList.remove('active'));
+                    if(activeSection) activeSection.classList.add('active');
+                    else showSection(currentHash || `#${sectionsData[0].id}`);
+
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const imgWidth = canvas.width;
+                    const imgHeight = canvas.height;
+                    const ratio = imgHeight / imgWidth;
+                    const imgHeightOnPdf = pdfWidth * ratio;
+                    let heightLeft = imgHeightOnPdf;
+                    let position = 0;
+
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightOnPdf);
+                    heightLeft -= pdf.internal.pageSize.getHeight();
+
+                    while (heightLeft > 0) {
+                        position -= pdf.internal.pageSize.getHeight();
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightOnPdf);
+                        heightLeft -= pdf.internal.pageSize.getHeight();
+                    }
+
+                    const participantName = localStorage.getItem('sesionc_nombre_participante') || 'participante';
+                    pdf.save(`Workbook_SesionC_${participantName}.pdf`);
+                    loadingIndicator.style.display = 'none';
+                }).catch(err => {
+                    console.error("Error al generar el PDF:", err);
+                    loadingIndicator.style.display = 'none';
+                    sections.forEach(s => s.classList.remove('active'));
+                    if(activeSection) activeSection.classList.add('active');
+                     else showSection(currentHash || `#${sectionsData[0].id}`);
+                });
+            });
+
+            // --- LÓGICA ESPECÍFICA PARA EJERCICIO 3 ---
+            function setupInvestmentDiagnosis_ej3() {
+                const ej3Section = document.getElementById('ej3');
+                if (!ej3Section) return;
+
+                const criteria = [
+                    { id: 'fcl', text: 'Conocías tu Flujo de Caja Libre (FCL) al momento de invertir.' },
+                    { id: 'ponder', text: 'Ponderaste la inversión según tu FCL contra otras posibles inversiones.' },
+                    { id: 'alternatives', text: 'Evaluaste alternativas con posibilidad de mayor rentabilidad.' },
+                    { id: 'backup', text: 'Respaldaste el monto requerido por escrito (cotización, plan, etc.).' },
+                    { id: 'roi', text: 'Hiciste un cálculo para determinar una Rentabilidad Esperada (ROI).' },
+                    { id: 'term', text: 'Definiste un plazo específico para recuperar la inversión.' },
+                    { id: 'risks', text: 'Identificaste los riesgos clave del proyecto.' },
+                    { id: 'mitigation', text: 'Ajustaste la inversión o tomaste acciones para mitigar esos riesgos.' }
+                ];
+
+                const matrixBody = ej3Section.querySelector('#evaluation-matrix tbody');
+                if (!matrixBody) return;
+                
+                matrixBody.innerHTML = ''; // Limpiar por si acaso
+                
+                criteria.forEach(criterion => {
+                    const row = document.createElement('tr');
+                    row.className = 'bg-white';
+                    let cells = `<td class="p-3 text-sm text-gray-800">${criterion.text}</td>`;
+                    for (let i = 1; i <= 3; i++) {
+                        cells += `
+                            <td class="p-3 text-center">
+                                <div class="flex justify-center space-x-2">
+                                    <input type="radio" name="ej3_${criterion.id}-${i}" id="ej3_${criterion.id}-${i}-yes" value="2" class="ej3-radio autosave-input" data-section="ej3" data-id="ej3_${criterion.id}-${i}">
+                                    <label for="ej3_${criterion.id}-${i}-yes">Sí</label>
+                                    
+                                    <input type="radio" name="ej3_${criterion.id}-${i}" id="ej3_${criterion.id}-${i}-partial" value="1" class="ej3-radio autosave-input" data-section="ej3" data-id="ej3_${criterion.id}-${i}">
+                                    <label for="ej3_${criterion.id}-${i}-partial">Parcial</label>
+
+                                    <input type="radio" name="ej3_${criterion.id}-${i}" id="ej3_${criterion.id}-${i}-no" value="0" class="ej3-radio autosave-input" data-section="ej3" data-id="ej3_${criterion.id}-${i}">
+                                    <label for="ej3_${criterion.id}-${i}-no">No</label>
+                                </div>
+                            </td>`;
+                    }
+                    row.innerHTML = cells;
+                    matrixBody.appendChild(row);
+                });
+
+                const inputs = ej3Section.querySelectorAll('input[type="radio"], input[type="text"]');
+                inputs.forEach(input => {
+                    input.addEventListener('change', calculateScores);
+                    input.addEventListener('input', calculateScores); // Para los text inputs
+                });
+
+                for (let i = 1; i <= 3; i++) {
+                    const nameInput = ej3Section.querySelector(`#investment-name-${i}`);
+                    if(nameInput) {
+                        nameInput.addEventListener('input', () => {
+                            const headers = ej3Section.querySelectorAll(`.investment-header-${i}`);
+                            headers.forEach(h => h.textContent = nameInput.value || `Inversión ${i}`);
+                        });
+                    }
+                }
+                
+                function getScoreColor(score, maxScore) {
+                    const percentage = (score / maxScore) * 100;
+                    if (percentage < 34) return 'bg-red-200 text-red-800';
+                    if (percentage < 67) return 'bg-yellow-200 text-yellow-800';
+                    return 'bg-green-200 text-green-800';
+                }
+
+                function calculateScores() {
+                    let totalScore = 0;
+                    let totalMaxScore = 0;
+
+                    for (let i = 1; i <= 3; i++) {
+                        let investmentScore = 0;
+                        let investmentMaxScore = 0;
+                        let hasInput = false;
+
+                        criteria.forEach(criterion => {
+                            const selectedRadio = ej3Section.querySelector(`input[name="ej3_${criterion.id}-${i}"]:checked`);
+                            if (selectedRadio) {
+                                investmentScore += parseInt(selectedRadio.value);
+                                investmentMaxScore += 2;
+                                hasInput = true;
+                            }
+                        });
+
+                        const scoreCell = ej3Section.querySelector(`#score-${i}`);
+                        scoreCell.textContent = investmentScore;
+                        scoreCell.className = `p-4 text-center text-xl score-cell ${getScoreColor(investmentScore, 16)}`;
+
+                        if (hasInput) {
+                            totalScore += investmentScore;
+                            totalMaxScore += investmentMaxScore;
+                        }
+                    }
+
+                    const generalScoreEl = ej3Section.querySelector('#general-score');
+                    const feedbackEl = ej3Section.querySelector('#score-feedback');
+                    
+                    if (totalMaxScore > 0) {
+                        const generalPercentage = Math.round((totalScore / totalMaxScore) * 100);
+                        generalScoreEl.textContent = `${generalPercentage}%`;
+                        if (generalPercentage < 34) {
+                            feedbackEl.textContent = "Hay una gran oportunidad para fortalecer tu proceso de decisión.";
+                            generalScoreEl.className = "text-6xl font-black my-2 text-red-600";
+                        } else if (generalPercentage < 67) {
+                            feedbackEl.textContent = "Tienes buenas bases, pero puedes profesionalizar más tus análisis.";
+                            generalScoreEl.className = "text-6xl font-black my-2 text-yellow-500";
+                        } else {
+                            feedbackEl.textContent = "¡Excelente! Tu proceso de inversión es robusto y bien fundamentado.";
+                            generalScoreEl.className = "text-6xl font-black my-2 text-green-600";
+                        }
+                    } else {
+                         generalScoreEl.textContent = `0%`;
+                         feedbackEl.textContent = "Define tus inversiones para comenzar.";
+                         generalScoreEl.className = "text-6xl font-black my-2 brand-blue";
+                    }
+                }
+                
+                calculateScores();
+            }
+
+            // --- LÓGICA ESPECÍFICA PARA EJERCICIO 4 (FCL 2.2) ---
+            function setupFCLCalculator2_2() {
+                const container = document.getElementById('fcl-container-2-2');
+                if (!container) return;
+
+                let period = 6;
+
+                const formatCurrency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+
+                const tableConfig = [
+                    { category: 'INGRESOS', type: 'header' },
+                    { id: 'sales', label: 'Ingresos por Ventas (Cobrados)', type: 'monthly' },
+                    { id: 'other_income', label: 'Otros Ingresos', type: 'monthly' },
+                    { category: 'GASTOS FIJOS', type: 'header' },
+                    { id: 'rent', label: 'Renta', type: 'monthly' },
+                    { id: 'salaries', label: 'Sueldos', type: 'monthly' },
+                    { id: 'other_fixed', label: 'Otros Gastos Fijos', type: 'monthly' },
+                    { category: 'GASTOS VARIABLES', type: 'header' },
+                    { id: 'cogs', label: 'Costo de Ventas', type: 'monthly' },
+                    { id: 'promo', label: 'Promoción', type: 'monthly' },
+                    { id: 'other_variable', label: 'Otros Gastos Variables', type: 'monthly' },
+                ];
+
+                const buildTable = () => {
+                    const table = container.querySelector('#fcl-input-table-2-2');
+                    table.innerHTML = '';
+
+                    const thead = document.createElement('thead');
+                    thead.className = 'bg-gray-50';
+                    let headerRow = '<tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">Concepto</th>';
+                    for (let i = 1; i <= period; i++) {
+                        headerRow += `<th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Mes ${i}</th>`;
+                    }
+                    headerRow += '<th class="px-4 py-3"></th></tr>';
+                    thead.innerHTML = headerRow;
+                    table.appendChild(thead);
+
+                    const tbody = document.createElement('tbody');
+                    tbody.className = 'bg-white divide-y divide-gray-200';
+                    
+                    tableConfig.forEach(item => {
+                        const tr = document.createElement('tr');
+                        if (item.type === 'header') {
+                            tr.className = item.category === 'INGRESOS' ? 'bg-blue-50' : (item.category === 'GASTOS FIJOS' ? 'bg-red-50' : 'bg-yellow-50');
+                            tr.innerHTML = `<td colspan="${period + 2}" class="px-4 py-2 font-bold ${item.category === 'INGRESOS' ? 'text-blue-800' : (item.category === 'GASTOS FIJOS' ? 'text-red-800' : 'text-yellow-800')}">${item.category}</td>`;
+                        } else {
+                            let cells = `<td class="px-4 py-3 text-sm text-gray-700">${item.label} <span class="text-gray-400" title="Explicación del campo">?</span></td>`;
+                            if (item.type === 'monthly') {
+                                for (let i = 1; i <= period; i++) {
+                                    cells += `<td class="px-2 py-1"><input type="number" id="fcl_${item.id}_${i}" placeholder="$0" class="fcl-input-2-2 w-full text-right p-2 border rounded-md autosave-input" data-section="ej4" data-id="fcl_${item.id}_${i}"></td>`;
+                                }
+                            }
+                            cells += `<td></td>`;
+                            tr.innerHTML = cells;
+                        }
+                        tbody.appendChild(tr);
+                    });
+                    table.appendChild(tbody);
+                    table.addEventListener('input', calculate);
+                };
+
+                const calculate = () => {
+                    const data = {};
+                    container.querySelectorAll('.fcl-input-2-2').forEach(input => {
+                        data[input.id] = parseFloat(input.value) || 0;
+                    });
+
+                    const monthlyFCLs = [];
+                    let totalFCL = 0;
+
+                    for (let i = 1; i <= period; i++) {
+                        const income = (data[`fcl_sales_${i}`] || 0) + (data[`fcl_other_income_${i}`] || 0);
+                        const expenses = (data[`fcl_rent_${i}`] || 0) + (data[`fcl_salaries_${i}`] || 0) + (data[`fcl_other_fixed_${i}`] || 0) +
+                                         (data[`fcl_cogs_${i}`] || 0) + (data[`fcl_promo_${i}`] || 0) + (data[`fcl_other_variable_${i}`] || 0);
+                        const fcl = income - expenses;
+                        monthlyFCLs.push(fcl);
+                        totalFCL += fcl;
+                    }
+
+                    const avgMonthlyFCL = totalFCL / period;
+                    const annualFCL = avgMonthlyFCL * 12;
+
+                    updateResults(monthlyFCLs, avgMonthlyFCL, annualFCL);
+                };
+
+                const updateResults = (monthlyFCLs, avgMonthlyFCL, annualFCL) => {
+                    container.querySelector('#fcl-results-container-2-2').classList.remove('hidden');
+                    
+                    const monthlyContainer = container.querySelector('#monthly-fcl-results-2-2');
+                    monthlyContainer.innerHTML = '';
+                    monthlyFCLs.forEach((fcl, index) => {
+                        const color = fcl >= 0 ? 'text-green-600' : 'text-red-600';
+                        monthlyContainer.innerHTML += `
+                            <div class="bg-white p-2 rounded shadow">
+                                <p class="text-xs text-gray-500">Mes ${index + 1}</p>
+                                <p class="font-bold ${color}">${formatCurrency(fcl)}</p>
+                            </div>
+                        `;
+                    });
+
+                    container.querySelector('#avg-monthly-fcl-2-2').textContent = formatCurrency(avgMonthlyFCL);
+                    container.querySelector('#annual-fcl-2-2').textContent = formatCurrency(annualFCL);
+
+                    const greenLimit = annualFCL > 0 ? annualFCL * 0.08 : 0;
+                    const blueLimit = annualFCL > 0 ? annualFCL * 0.20 : 0;
+                    const yellowLimit = annualFCL > 0 ? annualFCL * 0.70 : 0;
+                    
+                    container.querySelector('#semaphore-green-2-2 .font-medium').textContent = `${formatCurrency(0)} - ${formatCurrency(greenLimit)}`;
+                    container.querySelector('#semaphore-blue-2-2 .font-medium').textContent = `${formatCurrency(greenLimit + 0.01)} - ${formatCurrency(blueLimit)}`;
+                    container.querySelector('#semaphore-yellow-2-2 .font-medium').textContent = `${formatCurrency(blueLimit + 0.01)} - ${formatCurrency(yellowLimit)}`;
+                    container.querySelector('#semaphore-red-2-2 .font-medium').textContent = `${formatCurrency(yellowLimit + 0.01)} - ${formatCurrency(annualFCL)}`;
+                };
+
+                container.querySelector('#view-3m-2-2').addEventListener('click', () => {
+                    period = 3;
+                    container.querySelector('#view-3m-2-2').classList.add('bg-brand-blue', 'text-white');
+                    container.querySelector('#view-6m-2-2').classList.remove('bg-brand-blue', 'text-white');
+                    buildTable();
+                    loadSavedData();
+                    calculate();
+                });
+                container.querySelector('#view-6m-2-2').addEventListener('click', () => {
+                    period = 6;
+                    container.querySelector('#view-6m-2-2').classList.add('bg-brand-blue', 'text-white');
+                    container.querySelector('#view-3m-2-2').classList.remove('bg-brand-blue', 'text-white');
+                    buildTable();
+                    loadSavedData();
+                    calculate();
+                });
+
+                container.querySelectorAll('.fcl-tab-button-2-2').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tabId = button.dataset.tab;
+                        container.querySelectorAll('.fcl-tab-button-2-2').forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        container.querySelectorAll('.fcl-tab-content-2-2').forEach(content => {
+                            content.classList.toggle('active', content.id === `${tabId}-content-2-2`);
+                        });
+                    });
+                });
+
+                buildTable();
+            }
+
+            // --- PASO 4: INICIO DE LÓGICA ESPECÍFICA PARA EJERCICIOS AÑADIDOS ---
+
+            // --- LÓGICA ESPECÍFICA PARA EJERCICIO 2 ---
+            function setupExercise2() {
+                const ej2Section = document.getElementById('ej2');
+                if (!ej2Section) return;
+
+                const compensacionGroup = ej2Section.querySelector('#tipo-compensacion-group');
+                const sueldoFijoSection = ej2Section.querySelector('#sueldo-fijo-section');
+                const sueldoVariableSection = ej2Section.querySelector('#sueldo-variable-section');
+
+                function handleCompensacionChange() {
+                    const selectedRadio = compensacionGroup.querySelector('input[name="tipo_compensacion"]:checked');
+                    if (!selectedRadio) {
+                        sueldoFijoSection.classList.add('hidden');
+                        sueldoVariableSection.classList.add('hidden');
+                        return;
+                    }
+                    
+                    const selectedValue = selectedRadio.value;
+
+                    if (selectedValue === 'fijo') {
+                        sueldoFijoSection.classList.remove('hidden');
+                        sueldoVariableSection.classList.add('hidden');
+                    } else if (selectedValue === 'variable') {
+                        sueldoFijoSection.classList.add('hidden');
+                        sueldoVariableSection.classList.remove('hidden');
+                    } else if (selectedValue === 'mixto') {
+                        sueldoFijoSection.classList.remove('hidden');
+                        sueldoVariableSection.classList.remove('hidden');
+                    }
+                }
+
+                compensacionGroup.addEventListener('change', handleCompensacionChange);
+                
+                // Ejecutar al inicio para reflejar el estado pre-seleccionado o guardado
+                handleCompensacionChange();
+            }
+
+            // --- LÓGICA ESPECÍFICA PARA EJERCICIO 5 ---
+            function setupExercise5() {
+                const ej5Section = document.getElementById('ej5');
+                if (!ej5Section) return;
+                
+                // --- DATA ---
+                const areas = {
+                    Ventas: {
+                        label: 'Ventas',
+                        description: 'Incrementar unidades vendidas de productos actuales.',
+                        tactics: [
+                            { id: 'cierre', label: 'Incrementar la taza de cierre de clientes por vendedor (Desempeño ventas)' },
+                            { id: 'canales', label: 'Aumentar canales de venta / Numero Prospectos (Desarrollo Canales)' },
+                            { id: 'recompra', label: 'Mejorar la recompra de clientes (Recompra y fidelizacion)' }
+                        ]
+                    },
+                    Utilidad: {
+                        label: 'Utilidad',
+                        description: 'Mejorar el porcentaje de ganancia por unidad vendida dentro de un periodo.',
+                        tactics: [
+                            { id: 'precio', label: 'Valor Percibido / Precio Premium' },
+                            { id: 'costos_prod', label: 'Optimización de Costos de Producción y Entrega' },
+                            { id: 'eficiencia_costos', label: 'Eficiencia en la Estructura de Costos Fijos y Variables' },
+                            { id: 'cac', label: 'Eficiencia Comercial / Costo de Adquisición de Clientes' }
+                        ]
+                    },
+                    Operacion: {
+                        label: 'Operación',
+                        description: 'Capacidad para entregar lo vendido y procesos de soporte.',
+                        tactics: [
+                            { id: 'capacidad', label: 'Incrementar capacidad Instalada (productos o servicios entregados por semana o mes )' },
+                            { id: 'atencion', label: 'Mejorar tiempos / Calidad atención a clientes' },
+                            { id: 'soporte', label: 'Mejorar eficacia y eficiencia áreas soporte (Contabilidad,administracion, mantenimiento, TI, etc)' },
+                            { id: 'mandos', label: 'Desarrollo Mandos medios (Gerente Ventas, Operaciones, jefe sucursal)' }
+                        ]
+                    },
+                    Expansion: {
+                        label: 'Expansión',
+                        description: 'Nuevas sucursales, nuevos territorios, nuevos mercados, nuevos productos.',
+                        tactics: [
+                            { id: 'sucursales', label: 'Apertura o Desarrollo sucursales Nuevas' },
+                            { id: 'territorios', label: 'Apertura o Desarrollo territorios Nuevas' },
+                            { id: 'mercados', label: 'Apertura o Desarrollo mercados Nuevas' },
+                            { id: 'productos', label: 'Apertura o Desarrollo productos Nuevas' }
+                        ]
+                    }
+                };
+
+                // --- DOM ELEMENTS ---
+                const steps = {
+                    1: ej5Section.querySelector('#step-1'),
+                    2: ej5Section.querySelector('#step-2'),
+                    3: ej5Section.querySelector('#step-3'),
+                    4: ej5Section.querySelector('#step-4'),
+                    5: ej5Section.querySelector('#step-5')
+                };
+                const guidedAnalysisContainer = ej5Section.querySelector('#guided-analysis-container');
+                const priorityContainer = ej5Section.querySelector('#priority-areas-container');
+                const tacticsContainer = ej5Section.querySelector('#tactics-container');
+                const initiativesContainer = ej5Section.querySelector('#initiatives-container');
+                const synthesisContainer = ej5Section.querySelector('#synthesis-container');
+
+                // --- FUNCTIONS ---
+                function renderPriorityAreas() {
+                    priorityContainer.innerHTML = '';
+                    Object.keys(areas).forEach(key => {
+                        const area = areas[key];
+                        const div = document.createElement('div');
+                        div.className = 'grid grid-cols-1 md:grid-cols-3 gap-4 items-center bg-gray-50 p-4 rounded-lg border';
+                        div.innerHTML = `
+                            <div class="md:col-span-1">
+                                <label class="font-bold text-gray-800">${area.label}</label>
+                                <p class="text-sm text-gray-500">${area.description}</p>
+                            </div>
+                            <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
+                                <select id="priority-${key}" data-area="${key}" class="priority-select autosave-input p-2 border rounded-md sm:col-span-1" data-section="ej5" data-id="ej5_area_prio_${key}">
+                                    <option value="0">Prioridad...</option>
+                                    <option value="1">1 (Máxima)</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                </select>
+                                <textarea id="reason-${key}" placeholder="¿Por qué es esta tu prioridad?" rows="2" class="autosave-input p-2 border rounded-md sm:col-span-2" data-section="ej5" data-id="ej5_area_reason_${key}"></textarea>
+                            </div>
+                        `;
+                        priorityContainer.appendChild(div);
+                    });
+                    ej5Section.querySelectorAll('.priority-select').forEach(sel => sel.addEventListener('change', handlePriorityChange));
+                }
+
+                function handlePriorityChange() {
+                    let minPriority = 5;
+                    let highestPriorityArea = null;
+                    
+                    ej5Section.querySelectorAll('.priority-select').forEach(sel => {
+                        const priorityValue = parseInt(sel.value);
+                        if (priorityValue > 0 && priorityValue < minPriority) {
+                            minPriority = priorityValue;
+                            highestPriorityArea = sel.dataset.area;
+                        }
+                    });
+
+                    if (highestPriorityArea) {
+                        ej5Section.querySelector('#selected-priority-area').textContent = areas[highestPriorityArea].label;
+                        renderTactics(highestPriorityArea);
+                        steps[3].classList.remove('hidden-step');
+                        steps[3].classList.add('visible-step');
+                    } else {
+                        steps[3].classList.add('hidden-step');
+                        steps[3].classList.remove('visible-step');
+                        steps[4].classList.add('hidden-step');
+                        steps[4].classList.remove('visible-step');
+                        steps[5].classList.add('hidden-step');
+                        steps[5].classList.remove('visible-step');
+                    }
+                }
+
+                function renderTactics(areaKey) {
+                    tacticsContainer.innerHTML = '';
+                    const area = areas[areaKey];
+                    const tacticsDiv = document.createElement('div');
+                    tacticsDiv.className = 'bg-gray-50 p-4 rounded-lg border';
+                    tacticsDiv.innerHTML = `<h4 class="font-bold text-gray-800 mb-3">Tácticas para ${area.label}</h4>`;
+                    
+                    const checkboxContainer = document.createElement('div');
+                    checkboxContainer.className = 'space-y-2';
+                    
+                    area.tactics.forEach(tactic => {
+                        checkboxContainer.innerHTML += `
+                            <label class="flex items-center p-2 rounded-md hover:bg-gray-100 cursor-pointer">
+                                <input type="checkbox" name="tactic" value="${tactic.label}" data-area="${areaKey}" class="autosave-input form-checkbox h-5 w-5 text-brand-blue" data-section="ej5" data-id="ej5_tactic_${tactic.id}">
+                                <span class="ml-3 text-gray-700">${tactic.label}</span>
+                            </label>
+                        `;
+                    });
+                    
+                    tacticsDiv.appendChild(checkboxContainer);
+                    tacticsContainer.appendChild(tacticsDiv);
+
+                    tacticsContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                        checkbox.addEventListener('change', handleTacticChange);
+                    });
+                    handleTacticChange(); // Reset view
+                }
+
+                // REEMPLAZA LA FUNCIÓN ORIGINAL con esta versión mejorada:
+function handleTacticChange(event) {
+    // Convertimos a un Array para poder manipularlo fácilmente
+    let checkedCheckboxes = Array.from(tacticsContainer.querySelectorAll('input[type="checkbox"]:checked'));
+
+    // Si el usuario intenta seleccionar un tercer checkbox...
+    if (checkedCheckboxes.length > 2) {
+        if (event && event.target) {
+            // Se deselecciona automáticamente
+            event.target.checked = false;
+            // Y lo eliminamos de nuestra lista para que el resto de la lógica no lo cuente
+            checkedCheckboxes = checkedCheckboxes.filter(cb => cb !== event.target);
+        }
+    }
+
+    // Ahora, evaluamos el estado con la cantidad correcta de selecciones
+    if (checkedCheckboxes.length === 2) {
+        const selectedTactics = checkedCheckboxes.map(cb => cb.value);
+        const areaKey = checkedCheckboxes[0].dataset.area;
+        renderInitiatives(areaKey, selectedTactics);
+        steps[4].classList.remove('hidden-step');
+        steps[4].classList.add('visible-step');
+    } else {
+        // Si hay 1 o 0 selecciones, nos aseguramos de que el paso 4 y 5 estén ocultos
+        initiativesContainer.innerHTML = ''; // Limpiamos las iniciativas para evitar confusiones
+        steps[4].classList.add('hidden-step');
+        steps[4].classList.remove('visible-step');
+        steps[5].classList.add('hidden-step');
+        steps[5].classList.remove('visible-step');
+    }
+}
+
+                // REEMPLAZA LA FUNCIÓN ORIGINAL con esta versión:
+function renderInitiatives(areaKey, selectedTactics) {
+    initiativesContainer.innerHTML = '';
+    selectedTactics.forEach((tactic, index) => {
+        const div = document.createElement('div');
+        div.className = 'bg-gray-50 p-4 rounded-lg border';
+        div.innerHTML = `
+            <p class="text-sm font-semibold text-gray-500">Área: <span class="font-bold text-brand-blue">${areas[areaKey].label}</span></p>
+            <h4 class="font-bold text-gray-800 mt-1">Táctica ${index + 1}: ${tactic}</h4>
+            <textarea id="initiative-text-${index}" placeholder="Detalla la iniciativa concreta para esta táctica..." rows="3" class="autosave-input w-full mt-2 p-2 border rounded-md initiative-textarea" data-section="ej5" data-id="ej5_initiative_${index}"></textarea>
+        `;
+        initiativesContainer.appendChild(div);
+    });
+    initiativesContainer.querySelectorAll('.initiative-textarea').forEach(textarea => {
+        textarea.addEventListener('input', handleInitiativeChange);
+    });
+    // La llamada a loadSavedData() fue eliminada de aquí para mejorar la estabilidad.
+}
+
+                function handleInitiativeChange() {
+                    const textareas = initiativesContainer.querySelectorAll('.initiative-textarea');
+                    const allFilled = Array.from(textareas).every(ta => ta.value.trim() !== '');
+
+                    if (allFilled) {
+                        renderSynthesis();
+                        steps[5].classList.remove('hidden-step');
+                        steps[5].classList.add('visible-step');
+                    } else {
+                        steps[5].classList.add('hidden-step');
+                        steps[5].classList.remove('visible-step');
+                    }
+                }
+
+                function renderSynthesis() {
+                    const checkedCheckboxes = Array.from(tacticsContainer.querySelectorAll('input[type="checkbox"]:checked'));
+                    if(checkedCheckboxes.length < 2) return;
+
+                    const areaKey = checkedCheckboxes[0]?.dataset.area;
+                    const tactic1 = checkedCheckboxes[0]?.value;
+                    const tactic2 = checkedCheckboxes[1]?.value;
+                    const initiative1 = ej5Section.querySelector('#initiative-text-0')?.value;
+                    const initiative2 = ej5Section.querySelector('#initiative-text-1')?.value;
+
+                    if (!areaKey || !tactic1 || !tactic2 || !initiative1 || !initiative2) return;
+
+                    synthesisContainer.innerHTML = `
+                        <div class="font-semibold">
+                            <p class="text-gray-600">Área Clave Prioritaria:</p>
+                            <p class="text-lg text-brand-blue">${areas[areaKey].label}</p>
+                        </div>
+                        <div class="border-t my-4"></div>
+                        <div>
+                            <p class="text-gray-600">Táctica 1:</p>
+                            <p class="text-md font-bold text-gray-800">${tactic1}</p>
+                            <p class="text-gray-700 bg-white p-2 rounded mt-1"><strong>Iniciativa:</strong> ${initiative1}</p>
+                        </div>
+                        <div class="border-t my-4"></div>
+                        <div>
+                            <p class="text-gray-600">Táctica 2:</p>
+                            <p class="text-md font-bold text-gray-800">${tactic2}</p>
+                            <p class="text-gray-700 bg-white p-2 rounded mt-1"><strong>Iniciativa:</strong> ${initiative2}</p>
+                        </div>
+                    `;
+                }
+
+                ej5Section.querySelector('#btn-start-analysis').addEventListener('click', () => {
+                    steps[1].classList.add('hidden');
+                    guidedAnalysisContainer.classList.remove('hidden');
+                });
+
+                renderPriorityAreas();
+            }
+
+            // --- INICIALIZACIÓN FINAL ---
+            showSection(window.location.hash);
+            setupInvestmentDiagnosis_ej3(); 
+            setupFCLCalculator2_2(); 
+            setupExercise2(); // <-- Llamada nueva
+            setupExercise5(); // <-- Llamada nueva
+            loadSavedData(); // Cargar datos guardados después de que todo esté construido
+        });
+    </script>
+
+</body>
+</html>

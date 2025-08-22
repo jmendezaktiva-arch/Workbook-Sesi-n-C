@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workbook Interactivo - Sesión C (Parte 2)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body { font-family: 'Open Sans', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Montserrat', sans-serif; }
+        .brand-blue { color: #00529B; }
+        .brand-orange { color: #F68D2E; }
+        .bg-brand-blue { background-color: #00529B; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #00529B; border-radius: 10px; }
+
+        .section-content { display: none; transition: opacity 0.5s ease-in-out; opacity: 0; }
+        .section-content.active { display: block; opacity: 1; }
+        .nav-link.active { background-color: #eef2ff; color: #00529B; font-weight: 700; }
+        .completion-icon { transition: all 0.3s ease; }
+        
+        .instructions-box { background-color: #eff6ff; border-left: 4px solid #00529B; padding: 1rem; margin-bottom: 2rem; border-radius: 0 0.5rem 0.5rem 0; }
+        
+        .semaforo-indicator { transition: all 0.3s ease; padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 700; color: white; }
+        .risk-category-select { -webkit-appearance: none; -moz-appearance: none; appearance: none; background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); }
+        .tab-button-e9 { transition: all 0.2s ease-in-out; border-bottom: 4px solid transparent; }
+        .tab-button-e9.active { border-color: #00529B; color: #00529B; font-weight: bold; }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <aside class="w-full md:w-80 bg-white shadow-lg p-6 sticky top-0 h-screen overflow-y-auto flex flex-col">
+            <div class="flex items-center justify-center mb-6">
+                <img src="https://placehold.co/250x100/FFFFFF/00529B?text=Mi+Empresa\nCrece&font=montserrat" alt="Logo Mi Empresa Crece" class="h-20">
+            </div>
+            <div class="mb-6">
+                <h4 class="text-sm font-bold text-gray-600 mb-2">Progreso Sesión C (Parte 2)</h4>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-brand-blue h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+            <nav id="nav-menu" class="flex-grow">
+                <ul class="space-y-1"></ul>
+            </nav>
+            <div class="mt-auto pt-6">
+                <button id="export-pdf" class="w-full flex items-center justify-center gap-2 bg-brand-blue text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd" /></svg>
+                    Exportar a PDF
+                </button>
+            </div>
+            <div id="loading" class="mt-4 text-center" style="display: none;">
+                <p class="text-brand-blue animate-pulse">Generando PDF, por favor espera...</p>
+            </div>
+        </aside>
+
+        <main id="main-content" class="flex-1 p-6 md:p-10 overflow-y-auto">
+            <header class="bg-white shadow-md rounded-xl p-6 mb-8">
+                <h1 class="text-4xl font-black brand-blue">Workbook Interactivo</h1>
+                <p class="text-lg text-gray-600 mt-2">Sesión C: Gasto Inteligente, Inversiones Efectivas (Parte 2)</p>
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Nombre del participante" class="autosave-input p-3 border border-gray-300 rounded-lg" data-id="sesionc_p2_nombre_participante">
+                    <input type="text" placeholder="Empresa" class="autosave-input p-3 border border-gray-300 rounded-lg" data-id="sesionc_p2_nombre_empresa">
+                </div>
+            </header>
+        </main>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mainContent = document.getElementById('main-content');
+        const navMenu = document.getElementById('nav-menu').querySelector('ul');
+        
+        const sectionsData = [
+            { id: 'ej6', title: '6. Evaluación del Rendimiento' },
+            { id: 'ej7', title: '7. Evaluación del Monto' },
+            { id: 'ej8', title: '8. Evaluación del Plazo' },
+            { id: 'ej9', title: '9. Evaluación del Riesgo' },
+            { id: 'ej10', title: '10. Evaluación del Propósito' },
+        ];
+
+        sectionsData.forEach(data => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="#${data.id}" class="nav-link flex items-center gap-3 p-3 rounded-lg text-gray-600 hover:bg-gray-100 text-sm"><span class="completion-icon text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></span><span class="flex-grow">${data.title}</span></a>`;
+            navMenu.appendChild(li);
+            const section = document.createElement('section');
+            section.id = data.id;
+            section.className = 'section-content bg-white shadow-xl rounded-2xl p-8 mb-8';
+            mainContent.appendChild(section);
+        });
+            
+        document.getElementById('ej6').innerHTML = `<h2 class="text-2xl font-bold brand-orange mb-4">6. Evaluación del Rendimiento</h2><div class="instructions-box"><p><strong>Meta Transformacional:</strong> Traducir tu inversión a un lenguaje universal (numérico o estratégico) para tomar decisiones objetivas.</p></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="bg-gray-50 p-6 rounded-lg border"><h3 class="text-lg font-bold text-gray-800">Análisis Cuantitativo (ROI)</h3><p class="text-sm text-gray-500 mb-4">Para inversiones con beneficio medible en dinero.</p><div class="space-y-4"><div><label class="block text-sm font-medium">A. Monto Inversión</label><input type="number" id="monto-inversion-e6" placeholder="$100,000" class="w-full mt-1 p-2 border rounded-md autosave-input" data-section="ej6" data-id="ej6_monto_inversion"></div><div><label class="block text-sm font-medium">B. Rendimiento Total Esperado</label><input type="number" id="rendimiento-total-e6" placeholder="$50,000" class="w-full mt-1 p-2 border rounded-md autosave-input" data-section="ej6" data-id="ej6_rendimiento_total"></div><div><label class="block text-sm font-medium">C. Plazo en Meses</label><input type="number" id="plazo-e6" placeholder="24" class="w-full mt-1 p-2 border rounded-md autosave-input" data-section="ej6" data-id="ej6_plazo"></div></div><div class="text-center mt-6"><p class="text-gray-600">Rendimiento Anualizado</p><div id="rendimiento-anualizado-result" class="text-5xl font-black my-2 text-gray-400">0%</div><div id="semaforo-rendimiento" class="semaforo-indicator bg-gray-400 inline-block">Introduce datos</div></div></div><div class="bg-gray-50 p-6 rounded-lg border"><h3 class="text-lg font-bold text-gray-800">Análisis Cualitativo</h3><p class="text-sm text-gray-500 mb-4">Para inversiones con impacto estratégico no monetario.</p><div class="space-y-4"><div><label class="block text-sm font-medium">¿Qué problema clave resuelve?</label><textarea id="problema-e6" rows="2" placeholder="Ej: Alta rotación de personal técnico..." class="w-full mt-1 p-2 border rounded-md autosave-input" data-section="ej6" data-id="ej6_problema_resuelve"></textarea></div><div><label class="block text-sm font-medium">Calidad de la Solución</label><select id="calidad-solucion-e6" class="w-full mt-1 p-2 border rounded-md autosave-input" data-section="ej6" data-id="ej6_calidad_solucion"><option value="default">Selecciona...</option><option value="verde">Verde: Estratégica (Resuelve causa raíz)</option><option value="azul">Azul: Táctica (Resuelve un síntoma importante)</option><option value="amarillo">Amarillo: Ordinaria (Mejora marginal)</option><option value="rojo">Rojo: Bajo Impacto (No resuelve problema clave)</option></select></div></div><div class="text-center mt-6"><p class="text-gray-600">Calificación de Impacto</p><div id="calificacion-final-e6" class="semaforo-indicator bg-gray-400 inline-block mt-2">Selecciona</div></div></div></div>`;
+        document.getElementById('ej7').innerHTML = `<h2 class="text-2xl font-bold brand-orange mb-4">7. Evaluación del Monto</h2><div class="instructions-box"><p><strong>Meta Transformacional:</strong> Entender el peso de tus compromisos de inversión sobre tu capacidad financiera.</p></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="bg-gray-50 p-6 rounded-lg border"><h3 class="text-lg font-bold mb-4">Impacto en Liquidez</h3><div class="space-y-4"><div><label class="block text-sm font-medium">Tu FCL Mensual (de Ej. 4)</label><input type="number" id="fcl-mensual-e7" placeholder="$20,000" class="w-full mt-1 p-2 border rounded-md autosave-input" data-section="ej7" data-id="ej7_fcl_mensual"></div><div><label class="block text-sm font-medium">Monto Inversión Actual</label><input type="number" id="monto-inversion-e7" placeholder="$30,000" class="w-full mt-1 p-2 border rounded-md autosave-input" data-section="ej7" data-id="ej7_monto_inversion"></div></div><div class="text-center mt-6"><p class="text-gray-600">Equivale a:</p><div id="meses-fcl-result" class="text-5xl font-black my-2 text-gray-400">0</div><p class="text-xl font-bold">Meses de tu Flujo Libre</p><div id="semaforo-meses-fcl" class="semaforo-indicator bg-gray-400 inline-block mt-2">Introduce datos</div></div></div><div class="bg-gray-50 p-6 rounded-lg border"><h3 class="text-lg font-bold mb-4">Flujo Libre Anual Comprometido</h3><div><label class="block text-sm font-medium text-gray-600">Tu FCL Anual (Calculado de FCL Mensual)</label><p id="fcl-anual-display" class="text-xl font-bold brand-blue p-2 bg-gray-200 rounded-md mt-1">$0.00</p></div><div id="proyectos-container-e7" class="space-y-2 mt-4 max-h-40 overflow-y-auto pr-2"></div><button id="add-proyecto-btn-e7" class="mt-2 text-xs bg-gray-200 font-bold py-1 px-2 rounded-lg">+ Inversión</button><div class="mt-4"><div class="flex justify-between font-semibold"><span>Consumo Total: <span id="total-consumo-e7">$0</span></span><span><span id="porcentaje-consumo-e7">0</span>%</span></div><div class="w-full bg-gray-200 rounded-full h-6 mt-2"><div id="consumo-bar-e7" class="bg-blue-600 h-6 rounded-full transition-all duration-500" style="width: 0%;"></div></div><div id="semaforo-consumo-e7" class="text-center font-bold text-sm p-2 mt-2 rounded-md bg-gray-200 text-gray-800">Introduce tu FCL Mensual</div></div></div></div>`;
+        document.getElementById('ej8').innerHTML = `<h2 class="text-2xl font-bold brand-orange mb-4">8. Evaluación del Plazo</h2><div class="instructions-box"><p><strong>Meta Transformacional:</strong> Medir la velocidad con la que tu capital volverá a estar disponible.</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center"><div class="bg-gray-50 p-6 rounded-lg border space-y-4"><h3 class="text-lg font-bold">Semaforización del Plazo</h3><p class="text-sm text-gray-600 mb-4">Introduce el plazo de tu inversión para evaluar su riesgo en liquidez.</p><div><label class="block text-sm font-medium">Plazo propuesto (en Meses)</label><input type="number" id="plazo-inversion-e8" placeholder="6" class="w-full mt-1 p-2 border rounded-md autosave-input" data-section="ej8" data-id="ej8_plazo_propuesto"></div></div><div class="text-center"><p class="text-gray-600">Nivel de Riesgo por Liquidez</p><div id="semaforo-plazo" class="semaforo-indicator bg-gray-400 inline-block mt-2 text-lg">Introduce un plazo</div><p id="feedback-plazo" class="text-sm mt-4 font-semibold"></p></div></div>`;
+        document.getElementById('ej9').innerHTML = `<h2 class="text-2xl font-bold brand-orange mb-4">9. Evaluación del Riesgo</h2><div class="instructions-box"><p><strong>Meta Transformacional:</strong> Pasar de la incertidumbre a la gestión activa de riesgos.</p></div><div class="mb-4 border-b"><nav class="-mb-px flex space-x-4"><button class="tab-button-e9 active py-2 px-4 font-medium text-lg" data-tab="1">Iniciativa 1</button><button class="tab-button-e9 py-2 px-4 font-medium text-lg text-gray-500" data-tab="2">Iniciativa 2</button></nav></div><div id="risk-content-1" class="space-y-4"></div><div id="risk-content-2" class="space-y-4 hidden"></div>`;
+        document.getElementById('ej10').innerHTML = `<h2 class="text-2xl font-bold brand-orange mb-4">10. Evaluación del Propósito</h2><div class="instructions-box"><p><strong>Meta Transformacional:</strong> Asegurar que tu inversión esté 100% alineada con tus prioridades estratégicas.</p></div><div class="space-y-8"><div class="bg-gray-50 p-6 rounded-lg border"><h3 class="text-lg font-bold mb-4">1. Análisis de Alineación: Comparativo Rápido vs. Otras Áreas</h3><div class="overflow-x-auto"><table class="w-full text-sm border"><thead class="bg-gray-100"><tr><th class="p-2 w-1/3 font-semibold text-left">Áreas Clave Negocio</th><th class="p-2 font-semibold text-left">Tácticas para desarrollar áreas clave negocio</th></tr></thead><tbody id="tactics-reference-table" class="divide-y"></tbody></table></div><div class="mt-4"><label class="block text-sm font-semibold text-gray-700">Reflexión:</label><p class="text-sm text-gray-600 mb-2">¿Tu inversión está tocando de manera clara un área relevante, o podría haber una inversión de mayor impacto en otra área que sería conveniente abordar antes?</p><textarea rows="3" placeholder="Reflexiona aquí..." class="w-full p-2 border rounded-md autosave-input" data-section="ej10" data-id="ej10_reflexion2"></textarea></div></div><div class="bg-gray-50 p-6 rounded-lg border"><h3 class="text-lg font-bold mb-2">2. Análisis de Alineación: Prioridades de Inversión (Recapitulando Ej. 5)</h3><div class="space-y-4"><div class="p-4 bg-white border rounded-md"><h4 class="font-bold mb-2">Iniciativa de Inversión 1</h4><div class="grid grid-cols-1 md:grid-cols-3 gap-2"><select class="area-select-e10 p-2 border rounded-md autosave-input" data-section="ej10" data-id="ej10_area_1" data-tactic-id="tactic-select-1"></select><select id="tactic-select-1" class="p-2 border rounded-md autosave-input" data-section="ej10" data-id="ej10_tactica_1"></select><input type="text" placeholder="Iniciativa (nota a Ej. 5)" class="p-2 border rounded-md autosave-input" data-section="ej10" data-id="ej10_iniciativa_1"></div></div><div class="p-4 bg-white border rounded-md"><h4 class="font-bold mb-2">Iniciativa de Inversión 2</h4><div class="grid grid-cols-1 md:grid-cols-3 gap-2"><select class="area-select-e10 p-2 border rounded-md autosave-input" data-section="ej10" data-id="ej10_area_2" data-tactic-id="tactic-select-2"></select><select id="tactic-select-2" class="p-2 border rounded-md autosave-input" data-section="ej10" data-id="ej10_tactica_2"></select><input type="text" placeholder="Iniciativa (nota a Ej. 5)" class="p-2 border rounded-md autosave-input" data-section="ej10" data-id="ej10_iniciativa_2"></div></div></div><div class="mt-4"><label class="block text-sm font-semibold text-gray-700">Reflexión:</label><p class="text-sm text-gray-600 mb-2">¿La inversión que estás evaluando actualmente está 100% alineada con estas prioridades que definiste?</p><textarea rows="3" placeholder="Reflexiona aquí..." class="w-full p-2 border rounded-md autosave-input" data-section="ej10" data-id="ej10_reflexion3"></textarea></div></div></div>`;
+
+        // --- LÓGICA CENTRAL (Navegación, Autoguardado, Progreso, PDF) ---
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section-content');
+
+        function showSection(hash) {
+            const targetHash = hash || `#${sectionsData[0].id}`;
+            sections.forEach(s => s.classList.toggle('active', `#${s.id}` === targetHash));
+            navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === targetHash));
+        }
+
+        navMenu.addEventListener('click', e => {
+            const link = e.target.closest('.nav-link');
+            if (link) { e.preventDefault(); history.pushState(null, null, link.getAttribute('href')); showSection(link.getAttribute('href')); window.scrollTo(0, 0); }
+        });
+        
+        function checkCompletion() {
+            let completedSections = 0;
+            sectionsData.forEach(data => {
+                const sectionInputs = document.querySelectorAll(`.autosave-input[data-section="${data.id}"]`);
+                const isComplete = Array.from(sectionInputs).some(input => (input.type === 'checkbox' || input.type === 'radio') ? input.checked : input.value.trim() !== '');
+                const icon = document.querySelector(`.nav-link[href="#${data.id}"] .completion-icon`);
+                if (isComplete) { completedSections++; icon.classList.add('text-green-500'); icon.classList.remove('text-gray-400'); } 
+                else { icon.classList.remove('text-green-500'); icon.classList.add('text-gray-400'); }
+            });
+            document.getElementById('progress-bar').style.width = `${(completedSections / sectionsData.length) * 100}%`;
+        }
+
+        function loadSavedData() {
+            document.querySelectorAll('.autosave-input').forEach(input => {
+                const savedValue = localStorage.getItem('sesionc_p2_' + input.dataset.id);
+                if (savedValue) {
+                    if (input.type === 'radio' || input.type === 'checkbox') {
+                        if (input.value === savedValue || (input.type === 'checkbox' && savedValue === 'true')) input.checked = true;
+                    } else { input.value = savedValue; }
+                }
+            });
+            checkCompletion();
+        }
+
+        mainContent.addEventListener('input', e => {
+             if (e.target.classList.contains('autosave-input')) {
+                const input = e.target;
+                localStorage.setItem('sesionc_p2_' + input.dataset.id, (input.type === 'checkbox') ? input.checked : input.value);
+                checkCompletion();
+             }
+        });
+        
+        mainContent.addEventListener('change', e => {
+             if (e.target.classList.contains('autosave-input') && (e.target.type === 'radio' || e.target.tagName === 'SELECT')) {
+                localStorage.setItem('sesionc_p2_' + e.target.dataset.id, e.target.value);
+                checkCompletion();
+             }
+        });
+
+        document.getElementById('export-pdf').addEventListener('click', function() { /* Lógica PDF */ });
+
+        // --- INICIALIZACIÓN DE LÓGICA POR EJERCICIO ---
+        
+        function setupExercise6() {
+            const container = document.getElementById('ej6');
+            if (!container) return;
+            const montoE6 = container.querySelector('#monto-inversion-e6'), rendTotalE6 = container.querySelector('#rendimiento-total-e6'), plazoE6 = container.querySelector('#plazo-e6'), resAnualizado = container.querySelector('#rendimiento-anualizado-result'), semaforoRend = container.querySelector('#semaforo-rendimiento'), impactoCualitativo = container.querySelector('#calidad-solucion-e6'), calificacionFinalE6 = container.querySelector('#calificacion-final-e6');
+            function calculateAnnualizedROI() {
+                const m = parseFloat(montoE6.value) || 0, r = parseFloat(rendTotalE6.value) || 0, p = parseFloat(plazoE6.value) || 0;
+                if (m === 0 || p === 0) { resAnualizado.textContent = '0%'; semaforoRend.textContent = 'Introduce datos'; semaforoRend.className = 'semaforo-indicator bg-gray-400'; return; }
+                const roi = (r / m) / (p / 12) * 100;
+                resAnualizado.textContent = `${roi.toFixed(1)}%`;
+                if (roi <= 10) { semaforoRend.textContent = 'Bajo Interés'; semaforoRend.className = 'semaforo-indicator bg-red-500'; } 
+                else if (roi <= 20) { semaforoRend.textContent = 'Comparable'; semaforoRend.className = 'semaforo-indicator bg-blue-500'; } 
+                else if (roi <= 30) { semaforoRend.textContent = 'Aceptable'; semaforoRend.className = 'semaforo-indicator bg-blue-700'; } 
+                else { semaforoRend.textContent = 'Excelente'; semaforoRend.className = 'semaforo-indicator bg-green-500'; }
+            }
+            [montoE6, rendTotalE6, plazoE6].forEach(el => el.addEventListener('input', calculateAnnualizedROI));
+            impactoCualitativo.addEventListener('change', function() {
+                const f = { verde: {t:'Estratégica', c:'bg-green-500'}, azul: {t:'Táctica', c:'bg-blue-500'}, amarillo: {t:'Ordinaria', c:'bg-yellow-500 text-black'}, rojo: {t:'Bajo Impacto', c:'bg-red-500'}, default: {t:'Selecciona', c:'bg-gray-400'} };
+                calificacionFinalE6.textContent = f[this.value].t; calificacionFinalE6.className = `semaforo-indicator ${f[this.value].c}`;
+            });
+        }
+
+        function setupExercise7() {
+            const container = document.getElementById('ej7');
+            if (!container) return;
+            const fclMensualE7 = container.querySelector('#fcl-mensual-e7'), montoInversionE7 = container.querySelector('#monto-inversion-e7'), mesesFclResult = container.querySelector('#meses-fcl-result'), semaforoMeses = container.querySelector('#semaforo-meses-fcl'), fclAnualDisplay = container.querySelector('#fcl-anual-display'), proyectosContainerE7 = container.querySelector('#proyectos-container-e7'), addProyectoBtnE7 = container.querySelector('#add-proyecto-btn-e7'), totalConsumoE7 = container.querySelector('#total-consumo-e7'), porcentajeConsumoE7 = container.querySelector('#porcentaje-consumo-e7'), consumoBarE7 = container.querySelector('#consumo-bar-e7'), semaforoConsumoE7 = container.querySelector('#semaforo-consumo-e7');
+            let proyectoCountE7 = 0;
+            const formatCurrency = (v) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v);
+            function calculateFCLMonths() {
+                const fcl = parseFloat(fclMensualE7.value) || 0, monto = parseFloat(montoInversionE7.value) || 0;
+                if (fcl === 0) { mesesFclResult.textContent = '0'; semaforoMeses.textContent = 'Introduce FCL'; semaforoMeses.className = 'semaforo-indicator bg-gray-400'; return; }
+                const meses = monto / fcl;
+                mesesFclResult.textContent = meses.toFixed(1);
+                if (meses <= 1) { semaforoMeses.textContent = 'Bajo Impacto'; semaforoMeses.className = 'semaforo-indicator bg-green-500'; } 
+                else if (meses <= 3) { semaforoMeses.textContent = 'Impacto Moderado'; semaforoMeses.className = 'semaforo-indicator bg-yellow-500 text-black'; } 
+                else { semaforoMeses.textContent = 'Alto Impacto'; semaforoMeses.className = 'semaforo-indicator bg-red-500'; }
+            }
+            function updateConsumoFCL() {
+                const fclAnual = (parseFloat(fclMensualE7.value) || 0) * 12;
+                fclAnualDisplay.textContent = formatCurrency(fclAnual);
+                let totalInv = 0;
+                container.querySelectorAll('.proyecto-monto-e7').forEach(i => totalInv += parseFloat(i.value) || 0);
+                totalConsumoE7.textContent = formatCurrency(totalInv);
+                if (fclAnual === 0) { porcentajeConsumoE7.textContent = '0'; consumoBarE7.style.width = '0%'; semaforoConsumoE7.textContent = 'Introduce tu FCL Mensual'; semaforoConsumoE7.className = 'text-center... bg-gray-200'; return; }
+                const p = (totalInv / fclAnual) * 100;
+                porcentajeConsumoE7.textContent = p.toFixed(1);
+                consumoBarE7.style.width = `${Math.min(p, 100)}%`;
+                if (p <= 20) { semaforoConsumoE7.textContent = 'Nivel Saludable'; semaforoConsumoE7.className = 'text-center... bg-green-100 text-green-800'; } 
+                else if (p <= 50) { semaforoConsumoE7.textContent = 'Nivel Considerable'; semaforoConsumoE7.className = 'text-center... bg-yellow-100 text-yellow-800'; } 
+                else { semaforoConsumoE7.textContent = '¡Alerta! Alto Riesgo'; semaforoConsumoE7.className = 'text-center... bg-red-100 text-red-800'; }
+            }
+            function addProyectoE7() {
+                if (proyectoCountE7 >= 5) { addProyectoBtnE7.disabled = true; addProyectoBtnE7.textContent = "Máximo 5"; return; };
+                proyectoCountE7++;
+                const div = document.createElement('div');
+                div.className = 'grid grid-cols-3 gap-2 items-center';
+                div.innerHTML = `<input type="text" placeholder="Inversión ${proyectoCountE7}" class="col-span-2 p-1 border rounded autosave-input" data-section="ej7" data-id="ej7_p${proyectoCountE7}_desc"><input type="number" placeholder="$ Monto" class="proyecto-monto-e7 p-1 border rounded text-right autosave-input" data-section="ej7" data-id="ej7_p${proyectoCountE7}_monto">`;
+                proyectosContainerE7.appendChild(div);
+                div.querySelector('.proyecto-monto-e7').addEventListener('input', updateConsumoFCL);
+            }
+            addProyectoBtnE7.addEventListener('click', addProyectoE7);
+            fclMensualE7.addEventListener('input', () => { calculateFCLMonths(); updateConsumoFCL(); });
+            montoInversionE7.addEventListener('input', calculateFCLMonths);
+        }
+
+        function setupExercise8() {
+            const container = document.getElementById('ej8');
+            if(!container) return;
+            const pInput = container.querySelector('#plazo-inversion-e8'), semaforoP = container.querySelector('#semaforo-plazo'), feedbackP = container.querySelector('#feedback-plazo');
+            function evaluatePlazo() {
+                const m = parseFloat(pInput.value) || 0;
+                if (!pInput.value || m <= 0) { semaforoP.textContent = 'Introduce un plazo'; semaforoP.className = 'semaforo-indicator bg-gray-400'; feedbackP.textContent = ''; return; }
+                if (m <= 3) { semaforoP.textContent = 'Excelente (0-3 meses)'; semaforoP.className = 'semaforo-indicator bg-green-500'; feedbackP.textContent = 'Recuperación muy rápida. Ideal para mantener alta liquidez.'; } 
+                else if (m <= 6) { semaforoP.textContent = 'Bueno (3-6 meses)'; semaforoP.className = 'semaforo-indicator bg-blue-500'; feedbackP.textContent = 'Buen plazo de recuperación. Permite reinvertir con agilidad.'; } 
+                else if (m <= 12) { semaforoP.textContent = 'Aceptable (6-12 meses)'; semaforoP.className = 'semaforo-indicator bg-yellow-500 text-black'; feedbackP.textContent = 'Plazo estándar. Evalúa si inmoviliza demasiado capital.'; } 
+                else if (m <= 18) { semaforoP.textContent = 'Precaución (12-18 meses)'; semaforoP.className = 'semaforo-indicator bg-orange-500'; feedbackP.textContent = 'Plazo largo. Aumenta el riesgo por cambios en el mercado.'; } 
+                else { semaforoP.textContent = 'Alto Riesgo (+18 meses)'; semaforoP.className = 'semaforo-indicator bg-red-500'; feedbackP.textContent = 'Plazo muy largo. Compromete la liquidez a largo plazo.'; }
+            }
+            pInput.addEventListener('input', evaluatePlazo);
+        }
+
+        function setupExercise9() {
+            const container = document.getElementById('ej9');
+            if (!container) return;
+            const riskC1 = container.querySelector('#risk-content-1'), riskC2 = container.querySelector('#risk-content-2'), tabs = container.querySelectorAll('.tab-button-e9');
+            tabs.forEach(t => t.addEventListener('click', () => { tabs.forEach(tb => tb.classList.remove('active')); t.classList.add('active'); riskC1.classList.toggle('hidden', t.dataset.tab !== '1'); riskC2.classList.toggle('hidden', t.dataset.tab !== '2'); }));
+            const riskCats = { "Bajo": "Recuperación garantizada con rendimiento.", "Medio": "Recuperación garantizada sin rendimiento.", "Alto": "Pérdidas parciales o totales.", "Muy Alto": "Pérdidas más allá de la inversión." };
+            function createRiskBlock(iNum) {
+                const frag = document.createDocumentFragment();
+                for (let i = 1; i <= 3; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'bg-gray-50 p-4 rounded-lg border';
+                    div.innerHTML = `<h4 class="font-bold mb-2">Factor de Riesgo #${i}</h4><div class="space-y-4"><input type="text" placeholder="Describe el riesgo..." class="w-full p-2 border rounded autosave-input" data-section="ej9" data-id="ej9_i${iNum}_r${i}_desc"><div class="grid sm:grid-cols-2 gap-4"><div><label class="block text-sm">Evaluación Inicial</label><select class="risk-category-select w-full mt-1 p-2 border rounded autosave-input" data-section="ej9" data-id="ej9_i${iNum}_r${i}_eval1"><option>Bajo</option><option>Medio</option><option>Alto</option><option>Muy Alto</option></select></div><div><label class="block text-sm">Reevaluación</label><select class="w-full mt-1 p-2 border rounded autosave-input" data-section="ej9" data-id="ej9_i${iNum}_r${i}_eval2"><option>Bajo</option><option>Medio</option><option>Alto</option><option>Muy Alto</option></select></div></div><div class="risk-description text-xs text-gray-500 p-2 bg-white rounded">Selecciona un nivel para ver descripción.</div><textarea rows="2" placeholder="Acciones para mitigar..." class="w-full mt-1 p-2 border rounded autosave-input" data-section="ej9" data-id="ej9_i${iNum}_r${i}_mitiga"></textarea></div>`;
+                    div.querySelector('.risk-category-select').addEventListener('change', e => { div.querySelector('.risk-description').textContent = riskCats[e.target.value]; });
+                    frag.appendChild(div);
+                }
+                return frag;
+            }
+            riskC1.appendChild(createRiskBlock(1)); riskC2.appendChild(createRiskBlock(2));
+        }
+
+        function setupExercise10() {
+            const container = document.getElementById('ej10');
+            if (!container) return;
+            const tacticsData = { Ventas: ["Incrementar tasa de cierre", "Aumentar canales/prospectos", "Mejorar recompra"], Utilidad: ["Precio Premium", "Optimización de Costos", "Eficiencia en Gastos"], Operacion: ["Incrementar capacidad", "Mejorar atención", "Desarrollo mandos medios"], Expansion: ["Nuevas sucursales", "Nuevos mercados", "Nuevos productos"] };
+            const tacticsTable = container.querySelector('#tactics-reference-table');
+            Object.entries(tacticsData).forEach(([area, tactics]) => {
+                const row = tacticsTable.insertRow();
+                row.innerHTML = `<td class="p-2 font-bold align-top">${area}</td><td class="p-2 border-l">${tactics.join(', ')}</td>`;
+            });
+            container.querySelectorAll('.area-select-e10').forEach(sel => {
+                sel.innerHTML = '<option>Selecciona Área...</option>' + Object.keys(tacticsData).map(a => `<option value="${a}">${a}</option>`).join('');
+                sel.addEventListener('change', e => {
+                    const tacSel = container.querySelector(`#${e.target.dataset.tacticId}`);
+                    const area = e.target.value;
+                    tacSel.innerHTML = '<option>Selecciona Táctica...</option>' + (tacticsData[area] ? tacticsData[area].map(t => `<option value="${t}">${t}</option>`).join('') : '');
+                });
+            });
+        }
+
+        // --- INICIALIZACIÓN FINAL ---
+        showSection(window.location.hash);
+        loadSavedData();
+        setupExercise6();
+        setupExercise7();
+        setupExercise8();
+        setupExercise9();
+        setupExercise10();
+        
+        document.querySelectorAll('input, select, textarea').forEach(el => {
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            if(el.tagName === 'SELECT') el.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+    });
+    </script>
+</body>
+</html>
